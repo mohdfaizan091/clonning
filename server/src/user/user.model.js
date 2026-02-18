@@ -10,7 +10,6 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
-      unique: true,
       lowercase: true,
       trim: true,
     },
@@ -23,6 +22,6 @@ const userSchema = new mongoose.Schema(
 );
 
 // Index explicitly (clean habit)
-userSchema.index({ email: 1 });
+userSchema.index({ email: 1 }, { unique: true } );
 
 export default mongoose.model("User", userSchema);
