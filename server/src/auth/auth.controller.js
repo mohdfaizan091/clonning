@@ -2,6 +2,7 @@ import { registerUser } from "./auth.services.js";
 import { loginUser } from "./auth.services.js";
 import User from "../user/user.model.js";
 
+
  const register = async (req, res, next) => {
   try {
     const { username, email, password } = req.body;
@@ -61,12 +62,10 @@ const login = async (req, res, next) => {
   }
 };
 
+
 const getMe = async (req, res, next) => {
   try {
-    console.log('getMe called');
-    console.log('req.user:', req.user); // Debug line
-    console.log('req.user?.id:', req.user?.id); // Debug line
-    
+     
     const user = await User.findById(req.user.id).select("-password");
 
     res.status(200).json({
@@ -78,4 +77,16 @@ const getMe = async (req, res, next) => {
   }
 };
 
-export { register, login, getMe };
+const logout = async (req, res, next) => {
+  try {
+
+    res.clearCookie("token");
+    res.status(200).json({ message: "Logged out" });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+export { register, login, getMe, logout };
