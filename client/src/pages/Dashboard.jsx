@@ -42,6 +42,7 @@ function Dashboard() {
     <div className="dashboard">
       {user ? (
         <>
+          <h1>YOUR DASHBOARD</h1>
           <h2>Welcome {user.username}!</h2>
           <p>Email: {user.email}</p>
           <button onClick={handleLogout}>Logout</button>
