@@ -1,28 +1,14 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../api/api";
-import "../App.css";
+import { useAuth } from "../contexts/AuthContext";
 
 function Dashboard() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { user, logout, loading } = useAuth();
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await api.get("/auth/me");
-        setUser(res.data.user);
-      } catch {
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, []);
-
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
+  };
 
   if (loading) {
     return (
@@ -37,18 +23,51 @@ function Dashboard() {
     <div className="dashboard">
       {user ? (
         <>
-          <h1>YOUR DASHBOARD</h1>
-          <h2>Welcome {user.username}!</h2>
-          <p>Email: {user.email}</p>
-        </>
-      ) : (
-        <>
-          <h2>Not logged in</h2>
-          <div className="dashboard-actions">
-            <button onClick={() => navigate('/login')}>Go to Login</button>
-            <button onClick={() => navigate('/signup')}>Go to Signup</button>
+          <div className="dashboard-card">
+            <h2>Your Profile</h2>
+
+            <div className="user-info">
+              <div className="user-info-row">
+                <span className="user-info-label">Username</span>
+                <span className="user-info-value">{user.username}</span>
+              </div>
+              <div className="user-info-row">
+                <span className="user-info-label">Email</span>
+                <span className="user-info-value">{user.email}</span>
+              </div>
+              <div className="user-info-row">
+                <span className="user-info-label">Status</span>
+                <span className="status-badge status-online">Online</span>
+              </div>
+              <div className="user-info-row">
+                <span className="user-info-label">Joined</span>
+                <span className="user-info-value">
+                  {new Date(user.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </span>
+              </div>
+            </div>
+
+            <button className="btn-danger" onClick={handleLogout}>
+              Logout
+            </button>
           </div>
         </>
+      ) : (
+        <div className="dashboard-card">
+          <h2>Not logged in</h2>
+          <div className="dashboard-actions">
+            <button className="btn-secondary" onClick={() => navigate("/login")}>
+              Go to Login
+            </button>
+            <button className="btn-primary" onClick={() => navigate("/signup")}>
+              Go to Signup
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

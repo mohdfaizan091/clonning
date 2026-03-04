@@ -3,6 +3,7 @@ import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
+import morgan from "morgan";
 
 const app = express();
 
@@ -11,6 +12,12 @@ const authLimiter = rateLimit({
     max: 100,
     message: {success: false, message: "Too many requests, please try again later."},
 });
+
+if (process.env.NODE_ENV !== "production") {
+    app.use(morgan("dev"));
+  } else {
+    app.use(morgan("combined"));  
+  }
 
 app.use(helmet());
 app.use(express.json());

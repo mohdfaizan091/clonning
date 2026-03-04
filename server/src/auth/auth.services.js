@@ -42,10 +42,16 @@ export const loginUser = async ({ email, password }) => {
   const token = jwt.sign(
     { id: user._id },
     process.env.JWT_SECRET,
-    { expiresIn: "1h" }
+    { expiresIn: "15m" }
   );
 
-  return { user, token };
+  const refreshToken = jwt.sign(
+    { id: user._id },
+    process.env.REFRESH_TOKEN_SECRET,
+    { expiresIn: "7d" }
+  );
+
+  return { user, accessToken: token, refreshToken };
 };
 
 

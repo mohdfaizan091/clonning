@@ -1,6 +1,7 @@
-import { registerUser } from "./auth.services.js";
-import { loginUser } from "./auth.services.js";
+import { registerUser, loginUser } from "./auth.services.js";
 import User from "../user/user.model.js";
+import jwt from "jsonwebtoken";
+import AppError from "../utils/AppError.js";
 
 
  const register = async (req, res, next) => {
@@ -22,14 +23,20 @@ import User from "../user/user.model.js";
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+    const { user, accessToken, refreshToken } = await loginUser({ email, password });
 
-    const { user, token } = await loginUser({ email, password });
-
-    res.cookie("token", token, {
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 1000, // 1 hour
+      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    res.cookie("token", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+      maxAge: 15 * 60 * 1000, // 15 minutes
     });
 
     res.status(200).json({
@@ -38,6 +45,36 @@ const login = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
+  }
+};
+
+const refresh = async (req, res, next) => {
+  try {
+    const token = req.cookies.refreshToken;
+
+    if (!token) {
+      throw new AppError("Not authorized", 401);
+    }
+
+    const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+
+    // Naya access token banao
+    const accessToken = jwt.sign(
+      { id: decoded.id },
+      process.env.JWT_SECRET,
+      { expiresIn: "15m" }
+    );
+
+    res.cookie("token", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+      maxAge: 15 * 60 * 1000,
+    });
+
+    res.status(200).json({ success: true, message: "Token refreshed" });
+  } catch (error) {
+    next(new AppError("Not authorized", 401));
   }
 };
 
@@ -68,4 +105,4 @@ const logout = async (req, res, next) => {
 };
 
 
-export { register, login, getMe, logout };
+export { register, login,refresh, getMe, logout };
