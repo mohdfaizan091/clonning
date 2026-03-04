@@ -1,6 +1,7 @@
 import Application from "./application.model.js";
 import AppError from "../utils/AppError.js";
 import mongoose from "mongoose";
+import redis from "../utils/redis.js";
 
 // Create
 export const createApplication = async (userId, data) => {
@@ -8,6 +9,8 @@ export const createApplication = async (userId, data) => {
     user: userId,
     ...data,
   });
+
+  await redis.del(`stats:${userId}`);
   return application;
 };
 
@@ -79,6 +82,7 @@ export const updateApplication = async (userId, applicationId, data) => {
   if (!application) {
     throw new AppError("Application not found", 404);
   }
+  await redis.del(`stats:${userId}`);
 
   return application;
 };
@@ -93,35 +97,46 @@ export const deleteApplication = async (userId, applicationId) => {
   if (!application) {
     throw new AppError("Application not found", 404);
   }
-
+  await redis.del(`stats:${userId}`);
   return application;
 };
 
 export const getStats = async (userId) => {
-    const stats = await Application.aggregate([
-      { $match: { user: new mongoose.Types.ObjectId(userId) } },
-      {
-        $group: {
-          _id: "$status",
-          count: { $sum: 1 },
-        },
+  const cacheKey = `stats:${userId}`;
+
+  // Cache check karo pehle
+  const cached = await redis.get(cacheKey);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+
+  // Cache miss — MongoDB se fetch karo
+  const stats = await Application.aggregate([
+    { $match: { user: new mongoose.Types.ObjectId(userId) } },
+    {
+      $group: {
+        _id: "$status",
+        count: { $sum: 1 },
       },
-    ]);
-  
-    // Default structure
-    const result = {
-      total: 0,
-      Applied: 0,
-      Screening: 0,
-      Interview: 0,
-      Offer: 0,
-      Rejected: 0,
-    };
-  
-    stats.forEach((s) => {
-      result[s._id] = s.count;
-      result.total += s.count;
-    });
-  
-    return result;
+    },
+  ]);
+
+  const result = {
+    total: 0,
+    Applied: 0,
+    Screening: 0,
+    Interview: 0,
+    Offer: 0,
+    Rejected: 0,
   };
+
+  stats.forEach((s) => {
+    result[s._id] = s.count;
+    result.total += s.count;
+  });
+
+  // Cache mein save karo — 5 minutes ke liye
+  await redis.set(cacheKey, JSON.stringify(result), "EX", 300);
+
+  return result;
+};

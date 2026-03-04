@@ -13,6 +13,10 @@ const errorHandler = (err, req, res, next) => {
       method: req.method,
       url: req.originalUrl,
     });
+    
+    if (process.env.NODE_ENV === "production") {
+      Sentry.captureException(err);
+    }
   }
 
   res.status(statusCode).json({

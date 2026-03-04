@@ -4,6 +4,9 @@ import app from "./app.js";
 import connectDB from "./utils/db.js";
 import mongoose from "mongoose";
 import logger from "./utils/logger.js";
+import { initSentry } from "./utils/sentry.js";
+
+initSentry();
 
 
 const PORT = process.env.PORT || 3000;
