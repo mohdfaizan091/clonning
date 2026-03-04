@@ -7,20 +7,6 @@ import User from "../user/user.model.js";
   try {
     const { username, email, password } = req.body;
 
-    if (!username || !email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "All fields are required",
-      });
-    }
-
-    if (password.length < 6) {
-      return res.status(400).json({
-        success: false,
-        message: "Password must be at least 6 characters",
-      });
-    }
-
     await registerUser({ username, email, password });
 
     res.status(201).json({
@@ -36,13 +22,6 @@ import User from "../user/user.model.js";
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Email and password are required",
-      });
-    }
 
     const { user, token } = await loginUser({ email, password });
 
