@@ -13,12 +13,19 @@ const Navbar = () => {
 
   return (
     <nav className="navbar">
-      <ul>
+      <Link to="/" className="navbar-brand">myapp</Link>
+
+      <ul className="navbar-links">
         <li><Link to="/">Home</Link></li>
         {user ? (
           <>
             <li><Link to="/me">Dashboard</Link></li>
-            <li><button onClick={handleLogout}>Logout</button></li>
+            <li>
+              <button className="btn-danger" onClick={handleLogout}
+                style={{ padding: "6px 14px", fontSize: "0.78rem" }}>
+                Logout
+              </button>
+            </li>
           </>
         ) : (
           <>
