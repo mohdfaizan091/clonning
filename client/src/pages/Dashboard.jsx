@@ -23,11 +23,6 @@ function Dashboard() {
     fetchUser();
   }, []);
 
-  const handleLogout = async () => {
-    await api.post("/auth/logout");   // backend clears the cookie
-    setUser(null);
-    navigate('/login');
-  };
 
   if (loading) {
     return (
@@ -45,7 +40,6 @@ function Dashboard() {
           <h1>YOUR DASHBOARD</h1>
           <h2>Welcome {user.username}!</h2>
           <p>Email: {user.email}</p>
-          <button onClick={handleLogout}>Logout</button>
         </>
       ) : (
         <>
