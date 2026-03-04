@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";  // ← ADD
 import api from "../api/api";
 
 function Login() {
   const navigate = useNavigate();
+  const { setUser } = useAuth();  // ← ADD
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -16,7 +18,9 @@ function Login() {
 
     try {
       await api.post("/auth/login", form);
-      navigate("/me");          // cookie is set by backend, just redirect
+      const res = await api.get("/auth/me");  // ← ADD — user fetch karo
+      setUser(res.data.user);                 // ← ADD — context update karo
+      navigate("/me");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
     }
