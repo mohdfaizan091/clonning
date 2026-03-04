@@ -40,6 +40,10 @@ app.get("/home" , (req, res) => {
 import authRoutes from "./auth/auth.routes.js";
 app.use("/api/auth", authRoutes);
 
+// application routes
+import applicationRoutes from "./application/application.routes.js";
+app.use("/api/applications", applicationRoutes);
+
 
 import errorHandler from "./middlewares/error.middleware.js";
 app.use(errorHandler);

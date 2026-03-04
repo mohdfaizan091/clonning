@@ -8,6 +8,8 @@ import Footer from './pages/Footer';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import Dashboard from './pages/Dashboard'; 
+import Applications from './pages/Applications';
+import ApplicationForm from './pages/ApplicationForm';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -24,6 +26,15 @@ function App() {
             <ProtectedRoute>
               <Dashboard />
             </ProtectedRoute>
+        } />
+        <Route path="/applications" element={
+          <ProtectedRoute><Applications /></ProtectedRoute>
+        } />
+        <Route path="/applications/new" element={
+          <ProtectedRoute><ApplicationForm /></ProtectedRoute>
+        } />
+        <Route path="/applications/:id" element={
+          <ProtectedRoute><ApplicationForm /></ProtectedRoute>
         } />
       </Routes>
       <Footer />

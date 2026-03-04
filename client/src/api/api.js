@@ -11,15 +11,19 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Agar 401 aaya aur refresh already try nahi kiya
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Refresh route pe 401 aaye toh loop mat karo
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url.includes("/auth/refresh") && // ← ADD
+      !originalRequest.url.includes("/auth/me")          // ← ADD
+    ) {
       originalRequest._retry = true;
 
       try {
         await api.post("/auth/refresh");
-        return api(originalRequest); // original request dobara bhejo
+        return api(originalRequest);
       } catch {
-        // Refresh bhi fail — user ko logout karo
         window.location.href = "/login";
       }
     }

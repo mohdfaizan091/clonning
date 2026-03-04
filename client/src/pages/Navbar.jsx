@@ -19,6 +19,7 @@ const Navbar = () => {
         <li><Link to="/">Home</Link></li>
         {user ? (
           <>
+             <li><Link to="/applications">Applications</Link></li>
             <li><Link to="/me">Dashboard</Link></li>
             <li>
               <button className="btn-danger" onClick={handleLogout}
