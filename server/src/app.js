@@ -2,8 +2,15 @@ import express from "express";
 import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import rateLimit from "express-rate-limit";
 
 const app = express();
+
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10,
+    message: {success: false, message: "Too many requests, please try again later."},
+});
 
 app.use(helmet());
 app.use(express.json());
@@ -14,6 +21,9 @@ app.use(cors({
     credentials: true,
     })
 );
+
+app.use("/api/auth/login", authLimiter);
+app.use("/api/auth/register", authLimiter);
 
 //health route
 app.get("/home" , (req, res) => {
