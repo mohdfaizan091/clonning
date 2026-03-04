@@ -1,5 +1,6 @@
 import Application from "./application.model.js";
 import AppError from "../utils/AppError.js";
+import mongoose from "mongoose";
 
 // Create
 export const createApplication = async (userId, data) => {
@@ -95,3 +96,32 @@ export const deleteApplication = async (userId, applicationId) => {
 
   return application;
 };
+
+export const getStats = async (userId) => {
+    const stats = await Application.aggregate([
+      { $match: { user: new mongoose.Types.ObjectId(userId) } },
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+  
+    // Default structure
+    const result = {
+      total: 0,
+      Applied: 0,
+      Screening: 0,
+      Interview: 0,
+      Offer: 0,
+      Rejected: 0,
+    };
+  
+    stats.forEach((s) => {
+      result[s._id] = s.count;
+      result.total += s.count;
+    });
+  
+    return result;
+  };

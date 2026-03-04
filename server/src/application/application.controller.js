@@ -4,6 +4,7 @@ import {
     getApplicationById,
     updateApplication,
     deleteApplication,
+    getStats,
   } from "./application.services.js";
   
   export const create = async (req, res, next) => {
@@ -46,6 +47,15 @@ import {
     try {
       await deleteApplication(req.user.id, req.params.id);
       res.status(200).json({ success: true, message: "Application deleted" });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  export const stats = async (req, res, next) => {
+    try {
+      const data = await getStats(req.user.id);
+      res.status(200).json({ success: true, stats: data });
     } catch (error) {
       next(error);
     }

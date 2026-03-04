@@ -1,7 +1,7 @@
 import express from "express";
 import protect from "../middlewares/auth.middleware.js";
 import { body, validationResult } from "express-validator";
-import { create, getAll, getOne, update, remove } from "./application.controller.js";
+import { create, getAll, getOne, update, remove,stats } from "./application.controller.js";
 
 const router = express.Router();
 
@@ -49,9 +49,11 @@ const applicationValidation = [
 ];
 
 router.get("/", getAll);
+router.get("/stats", stats);
 router.get("/:id", getOne);
 router.post("/", applicationValidation, handleValidation, create);
 router.put("/:id", applicationValidation, handleValidation, update);
 router.delete("/:id", remove);
+
 
 export default router;
