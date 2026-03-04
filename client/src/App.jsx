@@ -11,6 +11,8 @@ import Dashboard from './pages/Dashboard';
 import Applications from './pages/Applications';
 import ApplicationForm from './pages/ApplicationForm';
 import ProtectedRoute from './components/ProtectedRoute';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 function App() {
   return (
@@ -36,6 +38,8 @@ function App() {
         <Route path="/applications/:id" element={
           <ProtectedRoute><ApplicationForm /></ProtectedRoute>
         } />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
       <Footer />
     </Router>

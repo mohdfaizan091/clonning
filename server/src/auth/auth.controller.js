@@ -1,4 +1,4 @@
-import { registerUser, loginUser } from "./auth.services.js";
+import { registerUser, loginUser, forgotPassword, resetPassword } from "./auth.services.js";
 import User from "../user/user.model.js";
 import jwt from "jsonwebtoken";
 import AppError from "../utils/AppError.js";
@@ -104,5 +104,58 @@ const logout = async (req, res, next) => {
   }
 };
 
+const forgotPasswordHandler = async (req, res, next) => {
+  try {
+    const { email } = req.body;
 
-export { register, login,refresh, getMe, logout };
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required",
+      });
+    }
+
+    await forgotPassword(email);
+
+    // Hamesha success return karo — user enumeration prevent
+    res.status(200).json({
+      success: true,
+      message: "If this email exists, a reset link has been sent",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+const resetPasswordHandler = async (req, res, next) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        message: "Password is required",
+      });
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 8 characters",
+      });
+    }
+
+    await resetPassword(token, password);
+
+    res.status(200).json({
+      success: true,
+      message: "Password reset successful",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { register, login,refresh, getMe, logout, forgotPasswordHandler, resetPasswordHandler};
