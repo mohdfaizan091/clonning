@@ -8,7 +8,7 @@ import Footer from './pages/Footer';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import Dashboard from './pages/Dashboard'; 
-
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -20,7 +20,11 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
-        <Route path="/me" element={<Dashboard />} />
+        <Route path="/me" element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+        } />
       </Routes>
       <Footer />
     </Router>
