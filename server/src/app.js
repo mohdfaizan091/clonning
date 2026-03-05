@@ -31,8 +31,8 @@ app.use(cors({
     })
 );
 
-app.use("/api/auth/login", authLimiter);
-app.use("/api/auth/register", authLimiter);
+app.use("/api/v1/auth/login", authLimiter);
+app.use("/api/v1/auth/register", authLimiter);
 
 //health route
 app.get("/home" , (req, res) => {
@@ -40,11 +40,11 @@ app.get("/home" , (req, res) => {
 })
 //sign-up route
 import authRoutes from "./auth/auth.routes.js";
-app.use("/api/auth", authRoutes);
+app.use("/api/v1/auth", authRoutes);
 
 // application routes
 import applicationRoutes from "./application/application.routes.js";
-app.use("/api/applications", applicationRoutes);
+app.use("/api/v1/applications", applicationRoutes);
 
 
 import errorHandler from "./middlewares/error.middleware.js";
