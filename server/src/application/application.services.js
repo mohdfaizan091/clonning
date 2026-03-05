@@ -10,7 +10,12 @@ export const createApplication = async (userId, data) => {
     ...data,
   });
 
-  await redis.del(`stats:${userId}`);
+  try {
+    await redis.del(`stats:${userId}`);
+  } catch {
+    logger.warn("Redis unavailable — cache not invalidated");
+  }
+  
   return application;
 };
 
@@ -82,7 +87,12 @@ export const updateApplication = async (userId, applicationId, data) => {
   if (!application) {
     throw new AppError("Application not found", 404);
   }
-  await redis.del(`stats:${userId}`);
+
+  try {
+    await redis.del(`stats:${userId}`);
+  } catch {
+    logger.warn("Redis unavailable — cache not invalidated");
+  }
 
   return application;
 };
@@ -97,7 +107,13 @@ export const deleteApplication = async (userId, applicationId) => {
   if (!application) {
     throw new AppError("Application not found", 404);
   }
-  await redis.del(`stats:${userId}`);
+
+  try {
+    await redis.del(`stats:${userId}`);
+  } catch {
+    logger.warn("Redis unavailable — cache not invalidated");
+  }
+  
   return application;
 };
 
@@ -105,10 +121,15 @@ export const getStats = async (userId) => {
   const cacheKey = `stats:${userId}`;
 
   // Cache check karo pehle
-  const cached = await redis.get(cacheKey);
-  if (cached) {
-    return JSON.parse(cached);
+  try {
+    const cached = await redis.get(cacheKey);
+      if (cached) {
+        return JSON.parse(cached);
+      }
+  } catch {
+      logger.warn("Redis unavailable — falling back to MongoDB");   
   }
+  
 
   // Cache miss — MongoDB se fetch karo
   const stats = await Application.aggregate([
@@ -136,7 +157,11 @@ export const getStats = async (userId) => {
   });
 
   // Cache mein save karo — 5 minutes ke liye
-  await redis.set(cacheKey, JSON.stringify(result), "EX", 300);
+  try {
+    await redis.set(cacheKey, JSON.stringify(result), "EX", 300);
+  } catch {
+    logger.warn("Redis unavailable — could not cache stats");
+  }
 
   return result;
 };
