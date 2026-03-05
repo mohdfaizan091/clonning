@@ -27,16 +27,16 @@ const login = async (req, res, next) => {
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      secure: true,
+      sameSite: "none",  // ← "strict" se "none" karo
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.cookie("token", accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
-      maxAge: 15 * 60 * 1000, // 15 minutes
+      secure: true,
+      sameSite: "none",  // ← "strict" se "none" karo
+      maxAge: 15 * 60 * 1000,
     });
 
     res.status(200).json({
