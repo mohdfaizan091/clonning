@@ -16,6 +16,7 @@
   "author": "",
   "license": "ISC",
   "description": "",
+
   "dependencies": {
     "@sentry/node": "^10.42.0",
     "bcrypt": "^6.0.0",
@@ -34,6 +35,9 @@
     "winston": "^3.19.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.11"
+    "nodemon": "^3.1.11",
+    "@jest/globals": "^29.7.0",
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
   }
 }
