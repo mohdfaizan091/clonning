@@ -2,6 +2,7 @@ import Application from "./application.model.js";
 import AppError from "../utils/AppError.js";
 import mongoose from "mongoose";
 import redis from "../utils/redis.js";
+import logger from "../utils/logger.js";
 
 // Create
 export const createApplication = async (userId, data) => {
@@ -15,7 +16,7 @@ export const createApplication = async (userId, data) => {
   } catch {
     logger.warn("Redis unavailable — cache not invalidated");
   }
-  
+
   return application;
 };
 
